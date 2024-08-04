@@ -12,7 +12,7 @@
 
 Установить зависимости `composer install`
 
-Указать данные для соединения(включая версию) с mysql в переменной окружения DATABASE_URL, которая находится в файле .env
+Указать данные для соединения(включая версию) с mysql в переменной окружения DATABASE_URL, которая находится в файле .env. Или создать файл .env.local и переопредилить ее в нем.
 
 Выполнить миграции
 `php bin/console doctrine:migrations:migrate`
@@ -51,7 +51,7 @@
     Status: 201 Created
     Content-Type: application/json
 
-    {"response":4}
+    {"book_id":4}
 
 ## Delete a Book
 
@@ -64,7 +64,7 @@
     Status: 200 OK
     Content-Type: application/json
 
-    {"response":1}
+    {"success":1}
 
 ## Create an Author
 
@@ -79,7 +79,7 @@
     Status: 201 Created
     Content-Type: application/json
 
-    {"response":2}
+    {"author_id":2}
 
 ## Delete an Author
 
@@ -92,7 +92,7 @@
     Status: 200 OK
     Content-Type: application/json
 
-    {"response":1}
+    {"success":1}
 
 ## Update a Publisher
 
@@ -107,7 +107,7 @@
     Status: 200 OK
     Content-Type: application/json
 
-    {"response":1}
+    {"success":1}
 
 ## Delete a Publisher
 
@@ -120,10 +120,17 @@
     Status: 200 OK
     Content-Type: application/json
 
-    {"response":1}
+    {"success":1}
     
 # Консольные команды
 
 `php bin/console db:seed` Добавить в базу данных тестовые данные
 
 `php bin/console delete:authors-without-books` Удалить из базы данных тех авторов, у которых нет книг
+
+# Дополнительные настройки
+
+С помощью переменной окружения `FORMAT` можно указать формат обмена сообщениями, json или xml
+Также можно указать токен авторизации в переменной `AUTH_TOKEN`, после чего выполнение запросов без авторизации станет невозможным.
+Для того, чтобы авторизоваться, необходимо передать в GET параметре token значение, установленное в переменной окружения `AUTH_TOKEN`.
+Например, `DELETE /publishers/id?token=your_token`

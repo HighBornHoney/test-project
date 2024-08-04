@@ -5,7 +5,10 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Publisher;
 
@@ -13,49 +16,26 @@ use App\Entity\Publisher;
 final class PublisherController extends AbstractController
 {
     #[Route('/{id}', name: 'publishers_update', methods: ['PUT', 'PATCH'])]
-    public function update(EntityManagerInterface $entityManager, int $id, Request $request): JsonResponse
+    public function update(Publisher $publisher, SerializerInterface $serializer, Request $request, ValidatorInterface $validator, EntityManagerInterface $entityManager): Response
     {
-        $publisher = $entityManager->getRepository(Publisher::class)->find($id);
+        $serializer->deserialize($request->getContent(), Publisher::class, $_ENV['FORMAT'], [AbstractNormalizer::OBJECT_TO_POPULATE => $publisher, AbstractNormalizer::ATTRIBUTES => ['title', 'address']]);
 
-        if (!$publisher) {
-            return $this->json(['error' => ['message' => "There is no publisher with id $id"]], 404);
+        $errors = $validator->validate($publisher);
+        if (count($errors) > 0) {
+            return new Response($serializer->serialize(['error' => ["{$errors->get(0)->getPropertyPath()}" => $errors->get(0)->getMessage()]], $_ENV['FORMAT']), 400);
         }
-
-        try {
-            $input = $this->container->get('serializer')->decode($request->getContent(), 'json');
-        } catch(\Exception $e) {
-            return $this->json(['error' => ['message' => 'Bad request']], 400);
-        }
-
-        if(!isset($input['title']) || $input['title'] === "") {
-            return $this->json(['error' => ['message' => 'The field title cannot be empty']], 400);
-        }
-
-        if(!isset($input['address']) || $input['address'] === "") {
-            return $this->json(['error' => ['message' => 'The field address cannot be empty']], 400);
-        }
-
-        $publisher->setTitle($input['title']);
-        $publisher->setAddress($input['address']);
-
-        $entityManager->persist($publisher);
+        
         $entityManager->flush();
-
-        return $this->json(['response' => 1], 200);
+        
+        return new Response($serializer->serialize(['success' => 1], $_ENV['FORMAT']), 200);
     }
     
     #[Route("/{id}", name: 'publishers_destroy', methods: ['DELETE'])]
-    public function destroy(EntityManagerInterface $entityManager, int $id): JsonResponse
+    public function destroy(Publisher $publisher, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
-        $publisher = $entityManager->getRepository(Publisher::class)->find($id);
-
-        if (!$publisher) {
-            return $this->json(['error' => ['message' => "There is no publisher with id $id"]], 404);
-        }
-
         $entityManager->remove($publisher);
         $entityManager->flush();
 
-        return $this->json(['response' => 1], 200);
+        return new Response($serializer->serialize(['success' => 1], $_ENV['FORMAT']), 200);
     }
 }

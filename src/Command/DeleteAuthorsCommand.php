@@ -4,13 +4,10 @@ namespace App\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Author;
 
 #[AsCommand(
     name: 'delete:authors-without-books',
@@ -32,21 +29,18 @@ class DeleteAuthorsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-
-        $authors = $this->entityManager->getRepository(Author::class)->findAll();
-
-        $deleted_authors_count = 0;
         
-        foreach ($authors as $author) {
-            if ($author->getBooks()->count() === 0) {
-                $this->entityManager->remove($author);
-                $deleted_authors_count++;
-            }
+        if (!$io->confirm('Are you sure you want to proceed?', true)) {
+            $io->error('Deleting cancelled!');
+            return Command::SUCCESS;
         }
-            
-        $this->entityManager->flush();
-
-        $io->success("Success! There were deleted $deleted_authors_count authors without books");
+        
+        $conn = $this->entityManager->getConnection();
+        
+        $sql = 'DELETE FROM author WHERE id NOT IN (SELECT DISTINCT author_id FROM book_author)';
+        $count = $conn->executeStatement($sql);
+        
+        $io->success("$count authors without books were deleted");
 
         return Command::SUCCESS;
     }
