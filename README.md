@@ -38,6 +38,19 @@
 
     {"id": 3, "title": "PHP 8", "year": "2023", "authors": [{"surname": "Симдянов"},{"surname": "Котеров"}],"publisher": {"title": "Scholastic"}}
 
+## Get a Book
+
+### Request
+
+`GET /books/id`
+
+### Response
+
+    Status: 200 OK
+    Content-Type: application/json
+
+    {"id": 3, "title": "PHP 8", "year": "2023", "authors": [{"id": 5, "name": "Дмитрий", "surname": "Котеров"},{"id": 6, "name": "Игорь", "surname": "Симдянов"}],"publisher": {"id": 4,"title": "БХВ", "address": "ул. Гончарная, дом 20, пом. 7Н 191036, Санкт-Петербург"}}
+
 ## Create a Book
 
 ### Request
@@ -52,6 +65,21 @@
     Content-Type: application/json
 
     {"book_id":4}
+
+## Update a Book
+
+### Request
+
+`POST /books/id`
+
+    {"title":"Awesome book","year":"2024","author_ids":[1,2,3,4,5],"publisher_id":3}
+
+### Response
+
+    Status: 200 OK
+    Content-Type: application/json
+
+    {"success":1}
 
 ## Delete a Book
 
