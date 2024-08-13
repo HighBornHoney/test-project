@@ -24,19 +24,19 @@ final class AuthorController extends AbstractController
         if (count($errors) > 0) {
             return new Response($serializer->serialize(['error' => ["{$errors->get(0)->getPropertyPath()}" => $errors->get(0)->getMessage()]], $_ENV['FORMAT']), 400);
         }
-        
+
         $entityManager->persist($author);
         $entityManager->flush();
-        
+
         return new Response($serializer->serialize(['author_id' => $author->getId()], $_ENV['FORMAT']), 201);
     }
-    
+
     #[Route('/{id}', name: 'authors_destroy', methods: ['DELETE'])]
     public function destroy(Author $author, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
         $entityManager->remove($author);
         $entityManager->flush();
-        
+
         return new Response($serializer->serialize(['success' => 1], $_ENV['FORMAT']), 200);
     }
 }

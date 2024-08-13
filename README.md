@@ -44,7 +44,7 @@
 
 `POST /books`
 
-    {"title":"Awesome book","year":"2024","author_ids":[1],"publisher_id":1}
+    {"title":"Awesome book","year":"2024","author_ids":[1,2],"publisher_id":1}
 
 ### Response
 

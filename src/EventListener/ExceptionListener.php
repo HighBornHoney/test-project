@@ -14,18 +14,20 @@ class ExceptionListener
 {
     public function __construct(
         private SerializerInterface $serializer,
-    ) {
+    )
+    {
     }
+
     public function __invoke(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
-        
+
         if ($exception instanceof NotFoundHttpException) {
             $response = new Response($this->serializer->serialize(['error' => 'Resource not found'], $_ENV['FORMAT']), 404);
         } elseif ($exception instanceof NotEncodableValueException || $exception instanceof NotNormalizableValueException) {
             $response = new Response($this->serializer->serialize(['error' => 'Bad request'], $_ENV['FORMAT']), 400);
         }
-        
+
         if (isset($response)) {
             $event->setResponse($response);
         }

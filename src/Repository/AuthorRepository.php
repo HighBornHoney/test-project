@@ -15,15 +15,14 @@ class AuthorRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Author::class);
     }
-    
+
     public function findByIds(array $ids): array
     {
-       return $this->createQueryBuilder('a')
-           ->where('a.id IN(:ids)')
-           ->setParameter('ids', $ids)
-           ->orderBy('a.id', 'ASC')
-           ->getQuery()
-           ->getResult()
-       ;
+        return $this->createQueryBuilder('a')
+            ->where('a.id IN(:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }

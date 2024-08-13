@@ -12,13 +12,15 @@ final class RequestListener
 {
     public function __construct(
         private SerializerInterface $serializer,
-    ) {
+    )
+    {
     }
+
     #[AsEventListener(event: KernelEvents::REQUEST)]
     public function onKernelRequest(RequestEvent $event): void
     {
-        $request = $event->getRequest();        
-        
+        $request = $event->getRequest();
+
         if (isset($_ENV['AUTH_TOKEN']) && $_ENV['AUTH_TOKEN'] !== '') {
             $token = $request->query->get('token');
             if ($token !== $_ENV['AUTH_TOKEN']) {

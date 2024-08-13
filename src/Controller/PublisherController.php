@@ -24,12 +24,12 @@ final class PublisherController extends AbstractController
         if (count($errors) > 0) {
             return new Response($serializer->serialize(['error' => ["{$errors->get(0)->getPropertyPath()}" => $errors->get(0)->getMessage()]], $_ENV['FORMAT']), 400);
         }
-        
+
         $entityManager->flush();
-        
+
         return new Response($serializer->serialize(['success' => 1], $_ENV['FORMAT']), 200);
     }
-    
+
     #[Route("/{id}", name: 'publishers_destroy', methods: ['DELETE'])]
     public function destroy(Publisher $publisher, EntityManagerInterface $entityManager, SerializerInterface $serializer): Response
     {
